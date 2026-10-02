@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ business.name }}</title>
+
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .business-header,
+        .working-hours,
+        .services {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        h1,
+        h2 {
+            margin-top: 0;
+        }
+
+        .business-info {
+            line-height: 2;
+            color: #555;
+        }
+
+        .working-hour-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f8f8;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 10px;
+        }
+
+        .closed {
+            color: #888;
+        }
+
+        .service-item {
+            display: block;
+            background: #f8f8f8;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .service-item h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- اطلاعات کسب‌وکار -->
+    <div class="business-header">
+
+        <h1>{{ business.name }}</h1>
+
+        <div class="business-info">
+
+            {% if business.description %}
+                <p>{{ business.description }}</p>
+            {% endif %}
+
+            {% if business.phone %}
+                <p>📞 {{ business.phone }}</p>
+            {% endif %}
+
+            {% if business.address %}
+                <p>📍 {{ business.address }}</p>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ساعات کاری -->
+    <div class="working-hours">
+
+        <h2>ساعات کاری</h2>
+
+        {% for hour in working_hours %}
+
+            <div class="working-hour-item">
+
+                <strong>
+                    {{ hour.get_weekday_display }}
+                </strong>
+
+                {% if hour.is_closed %}
+
+                    <span class="closed">
+                        تعطیل
+                    </span>
+
+                {% else %}
+
+                    <span>
+                        {{ hour.opening_time|time:"H:i" }}
+                        تا
+                        {{ hour.closing_time|time:"H:i" }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        {% empty %}
+
+            <p>
+                ساعات کاری ثبت نشده است.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- خدمات -->
+    <div class="services">
+
+        <h2>خدمات</h2>
+
+        {% for service in services %}
+
+            <a href="{% url 'service_detail' service.id %}"
+               class="service-item">
+
+                <h3>{{ service.name }}</h3>
+
+                <p>
+                    مدت زمان: {{ service.duration }} دقیقه
+                </p>
+
+                {% if service.price %}
+
+                    <p>
+                        قیمت: {{ service.price }} تومان
+                    </p>
+
+                {% endif %}
+
+            </a>
+
+        {% empty %}
+
+            <p>
+                در حال حاضر خدمتی برای این کسب‌وکار ثبت نشده است.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

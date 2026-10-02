@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        اطلاعات کسب‌وکار
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            background: #f5f6f8;
+
+            color: #222;
+
+            padding: 30px;
+        }
+
+
+        .container {
+
+            max-width: 900px;
+
+            margin: 0 auto;
+        }
+
+
+        .page-header {
+
+            margin-bottom: 25px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+        }
+
+
+        .page-header h1 {
+
+            margin: 0 0 8px 0;
+
+            font-size: 24px;
+        }
+
+
+        .page-header p {
+
+            margin: 0;
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           Edit Buttons
+           ========================= */
+
+        .edit-button {
+
+            display: inline-block;
+
+            background: #2563eb;
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 11px 18px;
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+
+        .edit-button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        .business-card {
+
+            background: #ffffff;
+
+            border-radius: 14px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.05);
+
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================
+           Business Image
+           ========================= */
+
+        .business-image {
+
+            width: 100%;
+
+            height: 220px;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            background: #f0f1f3;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        .business-image img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+
+        .image-placeholder {
+
+            color: #999;
+
+            font-size: 15px;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           Business Name
+           ========================= */
+
+        .business-name {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================
+           Section
+           ========================= */
+
+        .section {
+
+            margin-top: 25px;
+
+            padding-top: 25px;
+
+            border-top:
+                1px solid #eeeeee;
+        }
+
+
+        .section:first-of-type {
+
+            margin-top: 0;
+
+            padding-top: 0;
+
+            border-top: none;
+        }
+
+
+        .section-title-row {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .section-title {
+
+            font-size: 17px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           Info Rows
+           ========================= */
+
+        .info-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+
+        .info-row {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            background: #f8f9fa;
+
+            padding: 13px 15px;
+
+            border-radius: 8px;
+        }
+
+
+        .info-label {
+
+            color: #777;
+
+            font-size: 13px;
+
+            min-width: 90px;
+        }
+
+
+        .info-value {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            text-align: left;
+
+            line-height: 1.8;
+
+        }
+
+
+        /* =========================
+           Services
+           ========================= */
+
+        .services-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+
+        .service-item {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            background: #f8f9fa;
+
+            padding: 14px 15px;
+
+            border-radius: 8px;
+        }
+
+
+        .service-name {
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+
+        .service-details {
+
+            color: #777;
+
+            font-size: 12px;
+
+            text-align: left;
+        }
+
+
+        .empty-message {
+
+            padding: 20px;
+
+            background: #f8f9fa;
+
+            border-radius: 8px;
+
+            color: #888;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           Working Hours
+           ========================= */
+
+        .working-hours {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+
+        .working-day {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 12px 15px;
+
+            background: #f8f9fa;
+
+            border-radius: 8px;
+        }
+
+
+        .day-name {
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+
+        .day-hours {
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+
+        .day-closed {
+
+            color: #999;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           Responsive
+           ========================= */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding: 15px;
+            }
+
+
+            .page-header {
+
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .edit-button {
+
+                text-align: center;
+            }
+
+
+            .business-card {
+
+                padding: 18px;
+            }
+
+
+            .business-image {
+
+                height: 180px;
+            }
+
+
+            .section-title-row {
+
+                flex-direction: row;
+
+                align-items: center;
+            }
+
+
+            .info-row,
+            .service-item,
+            .working-day {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 6px;
+            }
+
+
+            .info-value,
+            .service-details {
+
+                text-align: right;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+
+
+        <!-- =========================
+             Header
+             ========================= -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    اطلاعات کسب‌وکار
+                </h1>
+
+                <p>
+                    اطلاعات و تنظیمات کسب‌وکار شما
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'owner_business_edit' %}"
+                class="edit-button"
+            >
+                ویرایش اطلاعات
+            </a>
+
+        </div>
+
+
+        <!-- =========================
+             Business Card
+             ========================= -->
+
+        <div class="business-card">
+
+
+            <!-- =========================
+                 Business Image
+                 ========================= -->
+
+            <div class="business-image">
+
+                {% if business.image %}
+
+                    <img
+                        src="{{ business.image.url }}"
+                        alt="{{ business.name }}"
+                    >
+
+                {% else %}
+
+                    <div class="image-placeholder">
+
+                        تصویر کسب‌وکار هنوز ثبت نشده است
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =========================
+                 Business Name
+                 ========================= -->
+
+            <div class="business-name">
+
+                {{ business.name }}
+
+            </div>
+
+
+            <!-- =========================
+                 Services
+                 ========================= -->
+
+            <div class="section">
+
+                <div class="section-title-row">
+
+                    <div class="section-title">
+
+                        خدمات
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'owner_services' %}"
+                        class="edit-button"
+                    >
+                        ویرایش خدمات
+                    </a>
+
+                </div>
+
+
+                {% if business.services.all %}
+
+                    <div class="services-list">
+
+                        {% for service in business.services.all %}
+
+                            {% if service.is_active %}
+
+                                <div class="service-item">
+
+                                    <div class="service-name">
+
+                                        {{ service.name }}
+
+                                    </div>
+
+
+                                    <div class="service-details">
+
+                                        {{ service.duration }}
+                                        دقیقه
+
+                                        {% if service.price %}
+
+                                            ·
+                                            {{ service.price }}
+                                            تومان
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-message">
+
+                        هنوز خدمتی برای این کسب‌وکار ثبت نشده است.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =========================
+                 Contact Information
+                 ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+
+                    اطلاعات تماس
+
+                </div>
+
+
+                <div class="info-list">
+
+
+                    <div class="info-row">
+
+                        <span class="info-label">
+
+                            شماره تلفن
+
+                        </span>
+
+
+                        <span class="info-value">
+
+                            {{ business.phone }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-row">
+
+                        <span class="info-label">
+
+                            آدرس
+
+                        </span>
+
+
+                        <span class="info-value">
+
+                            {% if business.address %}
+
+                                {{ business.address }}
+
+                            {% else %}
+
+                                ثبت نشده
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 Description
+                 ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+
+                    توضیحات
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-value">
+
+                        {% if business.description %}
+
+                            {{ business.description }}
+
+                        {% else %}
+
+                            توضیحاتی برای این کسب‌وکار ثبت نشده است.
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 Working Days
+                 ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+
+                    روزهای کاری
+
+                </div>
+
+
+                {% if business.working_hours.all %}
+
+                    <div class="working-hours">
+
+                        {% for working_hour in business.working_hours.all %}
+
+                            <div class="working-day">
+
+
+                                <span class="day-name">
+
+                                    {{ working_hour.get_weekday_display }}
+
+                                </span>
+
+
+                                {% if working_hour.is_closed %}
+
+                                    <span class="day-closed">
+
+                                        تعطیل
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="day-hours">
+
+                                        {{ working_hour.opening_time|time:"H:i" }}
+
+                                        تا
+
+                                        {{ working_hour.closing_time|time:"H:i" }}
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-message">
+
+                        ساعات کاری ثبت نشده است.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

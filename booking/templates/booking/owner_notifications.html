@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+
+```
+<title>اعلان‌ها</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 30px;
+
+        font-family: Tahoma, Arial, sans-serif;
+
+        background: #f5f6f8;
+        color: #222;
+    }
+
+    h1 {
+        margin-bottom: 25px;
+    }
+
+    .notification-item {
+        background: #ffffff;
+
+        padding: 18px;
+        margin-bottom: 12px;
+
+        border-radius: 10px;
+
+        border: 1px solid #e5e5e5;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+    .notification-item:hover {
+        background: #f8f9fa;
+    }
+
+    .notification-item.unread {
+        background: #eef6ff;
+
+        border-right: 4px solid #2196f3;
+    }
+
+    .notification-item.read {
+        opacity: 0.7;
+    }
+
+    .notification-title {
+        margin: 0 0 8px;
+
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .notification-message {
+        margin: 0 0 10px;
+
+        line-height: 1.8;
+
+        color: #555;
+    }
+
+    .notification-date {
+        font-size: 12px;
+
+        color: #999;
+    }
+
+    .empty {
+        background: #ffffff;
+
+        padding: 30px;
+
+        border-radius: 10px;
+
+        text-align: center;
+
+        color: #888;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<form
+    id="csrfForm"
+    style="display: none;"
+>
+    {% csrf_token %}
+</form>
+
+
+<h1>
+    اعلان‌های من
+</h1>
+
+
+{% if notifications %}
+
+    {% for notification in notifications %}
+
+        <div
+            class="notification-item {% if not notification.is_read %}unread{% else %}read{% endif %}"
+            data-notification-id="{{ notification.id }}"
+            onclick="markNotificationAsRead(this)"
+        >
+
+            <h3 class="notification-title">
+                {{ notification.title }}
+            </h3>
+
+
+            <p class="notification-message">
+                {{ notification.message }}
+            </p>
+
+
+            <div class="notification-date">
+                {{ notification.created_at }}
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <div class="empty">
+        اعلانی وجود ندارد.
+    </div>
+
+{% endif %}
+
+
+<script>
+
+    async function markNotificationAsRead(
+        element
+    ) {
+
+        const notificationId =
+            element.dataset.notificationId;
+
+
+        if (!notificationId) {
+            return;
+        }
+
+
+        if (
+            !element.classList.contains(
+                "unread"
+            )
+        ) {
+            return;
+        }
+
+
+        const csrfToken =
+            document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            ).value;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "{% url 'mark_notification_read' 0 %}"
+                        .replace(
+                            "/0/",
+                            `/${notificationId}/`
+                        ),
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "X-CSRFToken":
+                                csrfToken,
+                        },
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                console.error(
+                    "خطا در خوانده شدن اعلان:",
+                    data
+                );
+
+                return;
+            }
+
+
+            element.classList.remove(
+                "unread"
+            );
+
+            element.classList.add(
+                "read"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "خطا در ارتباط با سرور:",
+                error
+            );
+
+        }
+
+    }
+
+</script>
+```
+
+</body>
+
+</html>

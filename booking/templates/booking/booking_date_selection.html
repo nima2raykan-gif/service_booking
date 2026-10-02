@@ -1,0 +1,4741 @@
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>انتخاب تاریخ و ساعت</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family:
+                Tahoma,
+                Arial,
+                sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+
+
+        .service-name {
+            color: #666;
+            font-size: 15px;
+        }
+
+
+        /* =========================
+           DATE SECTION
+        ========================= */
+
+        .date-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+
+        .date-row {
+            width: 100%;
+            display: flex;
+            direction: ltr;
+            justify-content: center;
+            gap: 10px;
+        }
+
+
+        .date-row .date-item {
+            direction: rtl;
+        }
+
+
+        .today-row {
+            position: relative;
+            padding-top: 25px;
+        }
+
+
+        .today-row::before {
+            content: "امروز";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: #777;
+            font-weight: bold;
+        }
+
+
+        .today-row .date-item {
+            width: 150px;
+        }
+
+
+        .three-dates-row .date-item {
+            flex: 1;
+            min-width: 0;
+        }
+
+
+        .date-item {
+            min-height: 105px;
+            border: none;
+            border-radius: 14px;
+            padding: 15px 10px;
+            text-align: center;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+
+        .date-item.available {
+            background: white;
+            color: #222;
+            cursor: pointer;
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.06);
+            transition: 0.2s;
+        }
+
+
+        .date-item.available:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 5px 15px
+                rgba(0, 0, 0, 0.1);
+        }
+
+
+        .date-item.unavailable {
+            background: #e9e9e9;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+
+        .date-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+
+        .date-main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+
+        .weekday {
+            font-size: 13px;
+            color: #777;
+        }
+
+
+        .date-number {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+
+        .status {
+            font-size: 12px;
+        }
+
+
+        .available .status {
+            color: #16803c;
+        }
+
+
+        .unavailable .status {
+            color: #999;
+        }
+
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background:
+                rgba(0, 0, 0, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+
+        .modal {
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 22px;
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.25);
+            animation:
+                modalShow
+                0.2s
+                ease;
+        }
+
+
+        @keyframes modalShow {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(15px)
+                    scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+
+        }
+
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom:
+                1px solid #eee;
+        }
+
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+
+        .close-button {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #f2f2f2;
+            font-size: 21px;
+            cursor: pointer;
+        }
+
+
+        .modal-body {
+            padding: 22px;
+        }
+
+
+        .modal-info {
+            background: #f7f7f7;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+
+        .modal-info strong {
+            color: #222;
+        }
+
+
+        /* =========================
+           LOADING
+        ========================= */
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 10px;
+            color: #777;
+            font-size: 14px;
+        }
+
+
+        .spinner {
+            width: 34px;
+            height: 34px;
+            border:
+                4px solid #e5e5e5;
+            border-top-color: #222;
+            border-radius: 50%;
+            animation:
+                spin
+                0.8s
+                linear
+                infinite;
+            margin-bottom: 14px;
+        }
+
+
+        @keyframes spin {
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        /* =========================
+           CLOCK SECTION
+        ========================= */
+
+        .clock-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+
+        .clock-title {
+            margin: 0 0 15px;
+            font-size: 15px;
+            color: #666;
+            text-align: center;
+        }
+
+
+        /* =========================
+           TIMELINE
+        ========================= */
+
+        .timeline-wrapper {
+            width: 100%;
+            margin-bottom: 22px;
+        }
+
+
+        .timeline-scroll {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding:
+                38px
+                5px
+                40px;
+            direction: ltr;
+            scrollbar-width: thin;
+        }
+
+
+        .timeline-inner {
+            position: relative;
+            width: 100%;
+            min-width: 720px;
+            height: 118px;
+            direction: ltr;
+        }
+
+
+        /*
+         * کل نوار ساعات کاری
+         */
+
+        .timeline-track {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 38px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eaf8ef;
+            overflow: hidden;
+            border:
+                1px solid #cce8d5;
+        }
+
+
+        /*
+         * خطوط ساعت
+         */
+
+        .timeline-grid-line {
+            position: absolute;
+            top: 0;
+            height: 44px;
+            width: 1px;
+            background:
+                rgba(0, 0, 0, 0.09);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+
+        /*
+         * خطوط نیم‌ساعت
+         */
+
+        .timeline-half-line {
+            position: absolute;
+            top: 0;
+            height: 44px;
+            width: 1px;
+            background:
+                rgba(0, 0, 0, 0.045);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+
+        /*
+         * اسلات‌های قابل انتخاب
+         *
+         * فقط لایه کلیک هستند.
+         * رنگ را تعیین نمی‌کنند.
+         */
+
+        .timeline-slot {
+            position: absolute;
+            top: 0;
+            height: 44px;
+            border: none;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+
+        .timeline-slot:hover {
+            background:
+                rgba(22, 128, 60, 0.12);
+        }
+
+
+        .timeline-slot.disabled {
+            cursor: not-allowed;
+        }
+
+
+        .timeline-slot.disabled:hover {
+            background: transparent;
+        }
+
+
+        /*
+         * رزرو واقعی
+         */
+
+        .timeline-booked {
+            position: absolute;
+            top: 0;
+            height: 44px;
+            background: #e5484d;
+            border-radius: 8px;
+            z-index: 5;
+            pointer-events: none;
+            box-shadow:
+                inset 0 0 0 1px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        .timeline-booked-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform:
+                translate(-50%, -50%);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+
+        /*
+         * انتخاب کاربر
+         */
+
+        .timeline-selected {
+            position: absolute;
+            top: 33px;
+            height: 54px;
+            background:
+                rgba(22, 128, 60, 0.30);
+            border:
+                3px solid #16803c;
+            border-radius: 9px;
+            z-index: 7;
+            pointer-events: none;
+            display: none;
+        }
+
+
+        .timeline-selected-label {
+            position: absolute;
+            top: -29px;
+            left: 50%;
+            transform:
+                translateX(-50%);
+            white-space: nowrap;
+            color: #16803c;
+            font-size: 10px;
+            font-weight: bold;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+
+
+        /*
+         * برچسب زمان
+         */
+
+        .timeline-label {
+            position: absolute;
+            top: 88px;
+            transform:
+                translateX(-50%);
+            font-size: 11px;
+            color: #777;
+            white-space: nowrap;
+            z-index: 8;
+        }
+
+
+        .timeline-label::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 19px;
+            transform:
+                translateX(-50%);
+            width: 1px;
+            height: 8px;
+            background: #aaa;
+        }
+
+
+        .timeline-start-label {
+            transform:
+                translateX(0);
+        }
+
+
+        .timeline-start-label::before {
+            left: 0;
+            transform: none;
+        }
+
+
+        .timeline-end-label {
+            transform:
+                translateX(-100%);
+        }
+
+
+        .timeline-end-label::before {
+            left: 100%;
+            transform:
+                translateX(-100%);
+        }
+
+
+        /* =========================
+           LEGEND
+        ========================= */
+
+        .timeline-legend {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+
+        .legend-available {
+            background: #eaf8ef;
+            border:
+                1px solid #b8dfc4;
+        }
+
+
+        .legend-booked {
+            background: #e5484d;
+        }
+
+
+        .legend-selected {
+            background: #16803c;
+        }
+
+
+        /* =========================
+           CLOCK NUMBERS
+        ========================= */
+
+        .clock {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            direction: ltr;
+            margin-bottom: 22px;
+        }
+
+
+        .time-number {
+            width: 95px;
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+
+        .time-separator {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+
+        .time-controls {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            direction: ltr;
+            width: 100%;
+            margin-bottom: 22px;
+        }
+
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 115px;
+        }
+
+
+        .control-label {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 2px;
+        }
+
+
+        .control-buttons {
+            display: flex;
+            gap: 8px;
+            direction: ltr;
+        }
+
+
+        .control-button {
+            width: 48px;
+            height: 42px;
+            border: none;
+            border-radius: 10px;
+            background: #f0f0f0;
+            font-size: 23px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+
+        .control-button:hover {
+            background: #e3e3e3;
+        }
+
+
+        .control-button:active {
+            transform: scale(0.95);
+        }
+
+
+        /* =========================
+           AVAILABILITY
+        ========================= */
+
+        .availability {
+            width: 100%;
+            text-align: center;
+            border-radius: 12px;
+            padding: 13px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+
+        .availability.available {
+            background: #ecfdf3;
+            color: #067647;
+        }
+
+
+        .availability.unavailable {
+            background: #fff1f0;
+            color: #b42318;
+        }
+
+
+        .availability.loading {
+            background: #f7f7f7;
+            color: #777;
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .confirm-button,
+        .submit-booking-button {
+            width: 100%;
+            border: none;
+            border-radius: 13px;
+            padding: 15px;
+            background: #222;
+            color: white;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+
+        .confirm-button:hover,
+        .submit-booking-button:hover {
+            background: #000;
+        }
+
+
+        .confirm-button:disabled,
+        .submit-booking-button:disabled {
+            background: #ccc;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+
+        /* =========================
+           CUSTOMER FORM
+        ========================= */
+
+        .customer-section {
+            display: none;
+        }
+
+
+        .customer-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+
+        .customer-description {
+            color: #777;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+
+        .form-input {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 0 14px;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            direction: rtl;
+            transition: 0.2s;
+        }
+
+
+        .form-input:focus {
+            border-color: #888;
+            box-shadow:
+                0 0 0 3px
+                rgba(0, 0, 0, 0.05);
+        }
+
+
+        .phone-input {
+            direction: ltr;
+            text-align: left;
+        }
+
+
+        .customer-lookup-status {
+            display: none;
+            margin-top: 7px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+
+        .customer-lookup-status.loading {
+            display: block;
+            color: #777;
+        }
+
+
+        .customer-lookup-status.success {
+            display: block;
+            color: #067647;
+        }
+
+
+        .customer-lookup-status.new {
+            display: block;
+            color: #666;
+        }
+
+
+        .customer-lookup-status.error {
+            display: block;
+            color: #b42318;
+        }
+
+
+        .selected-booking {
+            background: #f7f7f7;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+
+        .selected-booking-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+
+        .selected-booking-label {
+            color: #777;
+        }
+
+
+        .selected-booking-value {
+            font-weight: bold;
+        }
+
+
+        .form-error {
+            display: none;
+            background: #fff1f0;
+            color: #b42318;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           SUCCESS
+        ========================= */
+
+        .success-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #ecfdf3;
+            color: #067647;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+
+
+        .success-title {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+
+        .success-message {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+
+        .success-info {
+            width: 100%;
+            background: #f7f7f7;
+            border-radius: 14px;
+            padding: 6px 15px;
+            margin-bottom: 20px;
+        }
+
+
+        .success-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 13px 0;
+            border-bottom:
+                1px solid #e5e5e5;
+            font-size: 14px;
+        }
+
+
+        .success-row:last-child {
+            border-bottom: none;
+        }
+
+
+        .success-row span {
+            color: #777;
+        }
+
+
+        .success-row strong {
+            color: #222;
+            text-align: left;
+            word-break: break-word;
+        }
+
+
+        /* =========================
+           ERROR
+        ========================= */
+
+        .error-message {
+            display: none;
+            background: #fff1f0;
+            color: #b42318;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 15px;
+            }
+
+
+            .header h1 {
+                font-size: 21px;
+            }
+
+
+            .date-row {
+                gap: 7px;
+            }
+
+
+            .today-row .date-item {
+                width: 125px;
+            }
+
+
+            .date-item {
+                min-height: 95px;
+                padding: 12px 6px;
+            }
+
+
+            .weekday {
+                font-size: 11px;
+            }
+
+
+            .date-number {
+                font-size: 14px;
+            }
+
+
+            .status {
+                font-size: 10px;
+            }
+
+
+            .modal-overlay {
+                padding: 10px;
+                align-items: flex-end;
+            }
+
+
+            .modal {
+                max-height: 92vh;
+                border-radius:
+                    22px 22px 0 0;
+            }
+
+
+            .modal-body {
+                padding: 20px;
+            }
+
+
+            .timeline-inner {
+                min-width: 720px;
+            }
+
+
+            .time-number {
+                width: 82px;
+                font-size: 42px;
+            }
+
+
+            .time-separator {
+                font-size: 36px;
+            }
+
+
+            .control-group {
+                width: 105px;
+            }
+
+
+            .control-button {
+                width: 45px;
+                height: 40px;
+            }
+
+        }
+
+
+        @media (max-width: 360px) {
+
+            .date-row {
+                gap: 5px;
+            }
+
+
+            .today-row .date-item {
+                width: 115px;
+            }
+
+
+            .date-item {
+                min-height: 90px;
+                padding: 10px 4px;
+            }
+
+
+            .date-number {
+                font-size: 13px;
+            }
+
+
+            .time-controls {
+                gap: 10px;
+            }
+
+
+            .time-number {
+                width: 72px;
+                font-size: 38px;
+            }
+
+
+            .control-group {
+                width: 95px;
+            }
+
+
+            .control-button {
+                width: 42px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<form
+    id="csrfForm"
+    style="display: none;"
+>
+
+    {% csrf_token %}
+
+</form>
+
+
+<div class="container">
+
+
+    <div class="header">
+
+        <h1>
+            انتخاب تاریخ
+        </h1>
+
+
+        <div class="service-name">
+
+            خدمت:
+
+            {{ service.name }}
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         DATE ROWS
+    ========================= -->
+
+    <div class="date-section">
+
+
+        <!-- امروز -->
+
+        <div class="date-row today-row">
+
+            {% with item=booking_dates.0 %}
+
+                {% if item.status == "available" %}
+
+                    <button
+                        type="button"
+                        class="date-item available"
+                        data-date="{{ item.date|date:'Y-m-d' }}"
+                        data-jalali="{{ item.jalali.weekday }} {{ item.jalali.day }} {{ item.jalali.month_name }}"
+                        onclick="openTimeModal(this.dataset.date, this.dataset.jalali)"
+                    >
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                قابل رزرو
+                            </div>
+
+                        </div>
+
+                    </button>
+
+
+                {% elif item.status == "full" %}
+
+                    <div class="date-item unavailable">
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                ظرفیت تکمیل
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="date-item unavailable">
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                تعطیل
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+        </div>
+
+
+        <!-- روزهای ۱ تا ۳ -->
+
+        <div class="date-row three-dates-row">
+
+            {% for item in booking_dates|slice:"1:4" %}
+
+                {% if item.status == "available" %}
+
+                    <button
+                        type="button"
+                        class="date-item available"
+                        data-date="{{ item.date|date:'Y-m-d' }}"
+                        data-jalali="{{ item.jalali.weekday }} {{ item.jalali.day }} {{ item.jalali.month_name }}"
+                        onclick="openTimeModal(this.dataset.date, this.dataset.jalali)"
+                    >
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                قابل رزرو
+                            </div>
+
+                        </div>
+
+                    </button>
+
+
+                {% elif item.status == "full" %}
+
+                    <div class="date-item unavailable">
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                ظرفیت تکمیل
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="date-item unavailable">
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                تعطیل
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- روزهای ۴ تا ۶ -->
+
+        <div class="date-row three-dates-row">
+
+            {% for item in booking_dates|slice:"4:7" %}
+
+                {% if item.status == "available" %}
+
+                    <button
+                        type="button"
+                        class="date-item available"
+                        data-date="{{ item.date|date:'Y-m-d' }}"
+                        data-jalali="{{ item.jalali.weekday }} {{ item.jalali.day }} {{ item.jalali.month_name }}"
+                        onclick="openTimeModal(this.dataset.date, this.dataset.jalali)"
+                    >
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                قابل رزرو
+                            </div>
+
+                        </div>
+
+                    </button>
+
+
+                {% elif item.status == "full" %}
+
+                    <div class="date-item unavailable">
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                ظرفیت تکمیل
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="date-item unavailable">
+
+                        <div class="date-content">
+
+                            <div class="date-main">
+
+                                <div class="weekday">
+                                    {{ item.jalali.weekday }}
+                                </div>
+
+                                <div class="date-number">
+                                    {{ item.jalali.day }}
+                                    {{ item.jalali.month_name }}
+                                </div>
+
+                            </div>
+
+                            <div class="status">
+                                تعطیل
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MODAL
+========================= -->
+
+<div
+    id="timeModal"
+    class="modal-overlay"
+    onclick="closeModalFromOverlay(event)"
+>
+
+
+    <div
+        class="modal"
+        onclick="event.stopPropagation()"
+    >
+
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                انتخاب ساعت
+            </h2>
+
+
+            <button
+                type="button"
+                class="close-button"
+                onclick="closeTimeModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+
+            <div
+                id="bookingInfo"
+                class="modal-info"
+            >
+
+                <div>
+                    خدمت:
+                    <strong>
+                        {{ service.name }}
+                    </strong>
+                </div>
+
+
+                <div>
+                    تاریخ:
+                    <strong id="selectedDate">
+                        -
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div
+                id="loadingState"
+                class="loading"
+            >
+
+                <div class="spinner"></div>
+
+                <div>
+                    در حال بررسی ساعت‌های قابل رزرو
+                </div>
+
+            </div>
+
+
+            <div
+                id="errorState"
+                class="error-message"
+            >
+                دریافت ساعت‌های قابل رزرو با مشکل مواجه شد.
+            </div>
+
+
+            <!-- =========================
+                 CLOCK SECTION
+            ========================= -->
+
+            <div
+                id="clockSection"
+                class="clock-section"
+            >
+
+
+                <div class="clock-title">
+                    ساعت موردنظر را انتخاب کنید
+                </div>
+
+
+                <!-- TIMELINE -->
+
+                <div class="timeline-wrapper">
+
+                    <div class="timeline-scroll">
+
+                        <div
+                            id="timelineInner"
+                            class="timeline-inner"
+                        >
+
+                            <div
+                                id="timelineTrack"
+                                class="timeline-track"
+                            >
+                            </div>
+
+
+                            <div
+                                id="timelineSelected"
+                                class="timeline-selected"
+                            >
+
+                                <div
+                                    id="timelineSelectedLabel"
+                                    class="timeline-selected-label"
+                                >
+                                    انتخاب شما
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="timeline-legend">
+
+                        <div class="legend-item">
+
+                            <span
+                                class="legend-color legend-available"
+                            ></span>
+
+                            آزاد
+
+                        </div>
+
+
+                        <div class="legend-item">
+
+                            <span
+                                class="legend-color legend-booked"
+                            ></span>
+
+                            رزرو شده
+
+                        </div>
+
+
+                        <div class="legend-item">
+
+                            <span
+                                class="legend-color legend-selected"
+                            ></span>
+
+                            انتخاب شما
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DIGITAL CLOCK -->
+
+                <div class="clock">
+
+                    <div
+                        id="hour"
+                        class="time-number"
+                    >
+                        10
+                    </div>
+
+
+                    <div class="time-separator">
+                        :
+                    </div>
+
+
+                    <div
+                        id="minute"
+                        class="time-number"
+                    >
+                        00
+                    </div>
+
+                </div>
+
+
+                <div class="time-controls">
+
+
+                    <div class="control-group">
+
+                        <div class="control-label">
+                            ساعت
+                        </div>
+
+
+                        <div class="control-buttons">
+
+                            <button
+                                type="button"
+                                class="control-button"
+                                onclick="changeHour(-1)"
+                            >
+                                −
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="control-button"
+                                onclick="changeHour(1)"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="control-group">
+
+                        <div class="control-label">
+                            دقیقه
+                        </div>
+
+
+                        <div class="control-buttons">
+
+                            <button
+                                type="button"
+                                class="control-button"
+                                onclick="changeMinute(-1)"
+                            >
+                                −
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="control-button"
+                                onclick="changeMinute(1)"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="availabilityStatus"
+                    class="availability loading"
+                >
+                    در حال بررسی
+                </div>
+
+            </div>
+
+
+            <button
+                id="confirmButton"
+                type="button"
+                class="confirm-button"
+                onclick="confirmTime()"
+                disabled
+            >
+                تأیید ساعت
+            </button>
+
+
+            <!-- CUSTOMER -->
+
+            <div
+                id="customerSection"
+                class="customer-section"
+            >
+
+                <div class="customer-title">
+                    اطلاعات مشتری
+                </div>
+
+
+                <div class="customer-description">
+
+                    ابتدا شماره موبایل مشتری را وارد کنید.
+                    اگر مشتری قبلاً ثبت شده باشد، نام او به‌صورت خودکار نمایش داده می‌شود.
+
+                </div>
+
+
+                <div class="selected-booking">
+
+                    <div class="selected-booking-row">
+
+                        <span class="selected-booking-label">
+                            خدمت
+                        </span>
+
+                        <span class="selected-booking-value">
+                            {{ service.name }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="selected-booking-row">
+
+                        <span class="selected-booking-label">
+                            تاریخ
+                        </span>
+
+                        <span
+                            id="customerDate"
+                            class="selected-booking-value"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <div class="selected-booking-row">
+
+                        <span class="selected-booking-label">
+                            ساعت
+                        </span>
+
+                        <span
+                            id="customerTime"
+                            class="selected-booking-value"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="formError"
+                    class="form-error"
+                >
+                    لطفاً اطلاعات مشتری را کامل وارد کنید.
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        for="customerPhone"
+                        class="form-label"
+                    >
+                        شماره موبایل
+                    </label>
+
+
+                    <input
+                        type="tel"
+                        id="customerPhone"
+                        class="form-input phone-input"
+                        placeholder="09123456789"
+                        inputmode="tel"
+                        autocomplete="tel"
+                    >
+
+
+                    <div
+                        id="customerLookupStatus"
+                        class="customer-lookup-status"
+                    ></div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        for="customerName"
+                        class="form-label"
+                    >
+                        نام و نام خانوادگی
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="customerName"
+                        class="form-input"
+                        placeholder="مثلاً علی رضایی"
+                        autocomplete="name"
+                    >
+
+                </div>
+
+
+                <button
+                    id="submitBookingButton"
+                    type="button"
+                    class="submit-booking-button"
+                    onclick="submitBooking()"
+                    disabled
+                >
+                    ثبت رزرو
+                </button>
+
+            </div>
+
+
+            <!-- SUCCESS -->
+
+            <div
+                id="successSection"
+                class="success-section"
+            >
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+
+                <h3 class="success-title">
+                    رزرو با موفقیت ثبت شد
+                </h3>
+
+
+                <div class="success-message">
+                    نوبت شما با موفقیت ثبت شد.
+                </div>
+
+
+                <div class="success-info">
+
+                    <div class="success-row">
+
+                        <span>
+                            خدمت
+                        </span>
+
+                        <strong id="successService">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="success-row">
+
+                        <span>
+                            مشتری
+                        </span>
+
+                        <strong id="successCustomer">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="success-row">
+
+                        <span>
+                            تاریخ
+                        </span>
+
+                        <strong id="successDate">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="success-row">
+
+                        <span>
+                            ساعت
+                        </span>
+
+                        <strong id="successTime">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="confirm-button"
+                    onclick="closeTimeModal()"
+                >
+                    بستن
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+    /* =========================
+       STATE
+    ========================= */
+
+    let hour = 10;
+
+    let minute = 0;
+
+    let selectedDateValue = null;
+
+    let selectedJalaliDate = "";
+
+    let selectedTime = null;
+
+    let availableTimes = new Set();
+
+    let bookedIntervals = [];
+
+    let businessOpening = null;
+
+    let businessClosing = null;
+
+    let serviceDuration = 0;
+
+    let phoneLookupTimer = null;
+
+    let phoneLookupRequestId = 0;
+
+
+    /* =========================
+       PHONE
+    ========================= */
+
+    function convertPersianDigits(value) {
+
+        const persianDigits =
+            "۰۱۲۳۴۵۶۷۸۹";
+
+        const arabicDigits =
+            "٠١٢٣٤٥٦٧٨٩";
+
+        const englishDigits =
+            "0123456789";
+
+
+        return String(value || "")
+
+            .replace(
+                /[۰-۹]/g,
+                digit =>
+                    englishDigits[
+                        persianDigits.indexOf(digit)
+                    ]
+            )
+
+            .replace(
+                /[٠-٩]/g,
+                digit =>
+                    englishDigits[
+                        arabicDigits.indexOf(digit)
+                    ]
+            );
+
+    }
+
+
+    function normalizePhone(value) {
+
+        let phone =
+            convertPersianDigits(value)
+                .trim()
+                .replace(/\s+/g, "")
+                .replace(/-/g, "")
+                .replace(/\(/g, "")
+                .replace(/\)/g, "");
+
+
+        if (phone.startsWith("+98")) {
+
+            phone =
+                "0" +
+                phone.substring(3);
+
+        }
+
+        else if (phone.startsWith("0098")) {
+
+            phone =
+                "0" +
+                phone.substring(4);
+
+        }
+
+
+        return phone;
+
+    }
+
+
+    /* =========================
+       TIME HELPERS
+    ========================= */
+
+    function timeToMinutes(timeString) {
+
+        if (!timeString) {
+            return null;
+        }
+
+
+        const parts =
+            String(timeString).split(":");
+
+
+        const hours =
+            Number(parts[0]);
+
+
+        const minutes =
+            Number(parts[1]);
+
+
+        if (
+            !Number.isFinite(hours) ||
+            !Number.isFinite(minutes)
+        ) {
+
+            return null;
+
+        }
+
+
+        if (
+            hours < 0 ||
+            hours > 23 ||
+            minutes < 0 ||
+            minutes > 59
+        ) {
+
+            return null;
+
+        }
+
+
+        return (
+            hours * 60 +
+            minutes
+        );
+
+    }
+
+
+    function minutesToTime(totalMinutes) {
+
+        const normalized =
+            ((totalMinutes % 1440) + 1440) % 1440;
+
+
+        const hours =
+            Math.floor(
+                normalized / 60
+            );
+
+
+        const minutes =
+            normalized % 60;
+
+
+        return (
+            String(hours).padStart(2, "0")
+            +
+            ":"
+            +
+            String(minutes).padStart(2, "0")
+        );
+
+    }
+
+
+    /* =========================
+       CHECK IF TIME IS IN BOOKING
+    ========================= */
+
+    function isTimeRangeFree(
+        startMinutes,
+        durationMinutes
+    ) {
+
+        const endMinutes =
+            startMinutes +
+            durationMinutes;
+
+
+        if (
+            !businessOpening ||
+            !businessClosing
+        ) {
+
+            return false;
+
+        }
+
+
+        const openingMinutes =
+            timeToMinutes(
+                businessOpening
+            );
+
+
+        const closingMinutes =
+            timeToMinutes(
+                businessClosing
+            );
+
+
+        if (
+            startMinutes < openingMinutes ||
+            endMinutes > closingMinutes
+        ) {
+
+            return false;
+
+        }
+
+
+        for (
+            const booking
+            of bookedIntervals
+        ) {
+
+            const bookingStart =
+                timeToMinutes(
+                    booking.start
+                );
+
+
+            const bookingEnd =
+                timeToMinutes(
+                    booking.end
+                );
+
+
+            if (
+                bookingStart === null ||
+                bookingEnd === null
+            ) {
+
+                continue;
+
+            }
+
+
+            if (
+                startMinutes < bookingEnd &&
+                endMinutes > bookingStart
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+
+    /* =========================
+       CLOCK
+    ========================= */
+
+    function updateClock() {
+
+        document
+            .getElementById("hour")
+            .textContent =
+                String(hour).padStart(2, "0");
+
+
+        document
+            .getElementById("minute")
+            .textContent =
+                String(minute).padStart(2, "0");
+
+
+        checkCurrentTimeAvailability();
+
+        updateTimelineSelection();
+
+    }
+
+
+    function changeHour(amount) {
+
+        hour += amount;
+
+
+        if (hour > 23) {
+            hour = 0;
+        }
+
+
+        if (hour < 0) {
+            hour = 23;
+        }
+
+
+        updateClock();
+
+    }
+
+
+    function changeMinute(amount) {
+
+        minute +=
+            amount * 15;
+
+
+        if (minute >= 60) {
+
+            minute = 0;
+
+            hour += 1;
+
+        }
+
+
+        if (minute < 0) {
+
+            minute = 45;
+
+            hour -= 1;
+
+        }
+
+
+        if (hour > 23) {
+            hour = 0;
+        }
+
+
+        if (hour < 0) {
+            hour = 23;
+        }
+
+
+        updateClock();
+
+    }
+
+
+    function getCurrentTimeString() {
+
+        return (
+            String(hour).padStart(2, "0")
+            +
+            ":"
+            +
+            String(minute).padStart(2, "0")
+        );
+
+    }
+
+
+    /* =========================
+       AVAILABILITY
+    ========================= */
+
+    function checkCurrentTimeAvailability() {
+
+        const status =
+            document.getElementById(
+                "availabilityStatus"
+            );
+
+
+        const confirmButton =
+            document.getElementById(
+                "confirmButton"
+            );
+
+
+        const currentTime =
+            getCurrentTimeString();
+
+
+        selectedTime = null;
+
+
+        if (
+            availableTimes.has(
+                currentTime
+            )
+        ) {
+
+            status.className =
+                "availability available";
+
+
+            status.textContent =
+                "✓ این ساعت قابل رزرو است";
+
+
+            confirmButton.disabled =
+                false;
+
+
+            selectedTime =
+                currentTime;
+
+        }
+
+        else {
+
+            status.className =
+                "availability unavailable";
+
+
+            status.textContent =
+                "✕ این ساعت در حال حاضر قابل رزرو نیست";
+
+
+            confirmButton.disabled =
+                true;
+
+        }
+
+    }
+
+
+    /* =========================
+       TIMELINE
+    ========================= */
+
+    function renderTimeline() {
+
+        const inner =
+            document.getElementById(
+                "timelineInner"
+            );
+
+
+        const track =
+            document.getElementById(
+                "timelineTrack"
+            );
+
+
+        const selected =
+            document.getElementById(
+                "timelineSelected"
+            );
+
+
+        if (
+            !inner ||
+            !track ||
+            !selected ||
+            !businessOpening ||
+            !businessClosing
+        ) {
+
+            return;
+
+        }
+
+
+        const openingMinutes =
+            timeToMinutes(
+                businessOpening
+            );
+
+
+        const closingMinutes =
+            timeToMinutes(
+                businessClosing
+            );
+
+
+        if (
+            openingMinutes === null ||
+            closingMinutes === null ||
+            closingMinutes <= openingMinutes
+        ) {
+
+            return;
+
+        }
+
+
+        const totalMinutes =
+            closingMinutes -
+            openingMinutes;
+
+
+        /*
+         * 80 پیکسل برای هر ساعت
+         *
+         * این مقدار باعث می‌شود
+         * Timeline روی موبایل هم
+         * قابل مشاهده و اسکرول باشد.
+         */
+
+        const timelineWidth =
+            Math.max(
+                720,
+                totalMinutes * (80 / 60)
+            );
+
+
+        inner.style.width =
+            timelineWidth + "px";
+
+
+        inner.style.minWidth =
+            timelineWidth + "px";
+
+
+        /*
+         * پاک کردن کامل Timeline
+         */
+
+        track.innerHTML = "";
+
+
+        inner
+            .querySelectorAll(
+                ".timeline-slot, " +
+                ".timeline-label, " +
+                ".timeline-grid-line, " +
+                ".timeline-half-line"
+            )
+            .forEach(
+                element =>
+                    element.remove()
+            );
+
+
+        /*
+         * -------------------------
+         * خطوط زمانی
+         * -------------------------
+         */
+
+        for (
+            let offset = 0;
+            offset <= totalMinutes;
+            offset += 15
+        ) {
+
+            const position =
+                (
+                    offset /
+                    totalMinutes
+                ) * 100;
+
+
+            const line =
+                document.createElement(
+                    "div"
+                );
+
+
+            if (
+                offset % 60 === 0
+            ) {
+
+                line.className =
+                    "timeline-grid-line";
+
+            }
+
+            else {
+
+                line.className =
+                    "timeline-half-line";
+
+            }
+
+
+            line.style.left =
+                position + "%";
+
+
+            track.appendChild(
+                line
+            );
+
+        }
+
+
+        /*
+         * -------------------------
+         * اسلات‌های ۱۵ دقیقه‌ای
+         * -------------------------
+         */
+
+        for (
+            let offset = 0;
+            offset < totalMinutes;
+            offset += 15
+        ) {
+
+            const startMinutes =
+                openingMinutes +
+                offset;
+
+
+            const endMinutes =
+                Math.min(
+                    startMinutes + 15,
+                    closingMinutes
+                );
+
+
+            const time =
+                minutesToTime(
+                    startMinutes
+                );
+
+
+            const left =
+                (
+                    offset /
+                    totalMinutes
+                ) * 100;
+
+
+            const width =
+                (
+                    (endMinutes -
+                        startMinutes)
+                    /
+                    totalMinutes
+                ) * 100;
+
+
+            const slot =
+                document.createElement(
+                    "button"
+                );
+
+
+            slot.type =
+                "button";
+
+
+            slot.className =
+                "timeline-slot";
+
+
+            slot.dataset.time =
+                time;
+
+
+            slot.style.left =
+                left + "%";
+
+
+            slot.style.width =
+                width + "%";
+
+
+            /*
+             * فقط start time هایی که
+             * API آزاد اعلام کرده
+             * قابل انتخاب هستند.
+             */
+
+            if (
+                availableTimes.has(
+                    time
+                )
+            ) {
+
+                slot.addEventListener(
+                    "click",
+                    function () {
+
+                        selectTimelineTime(
+                            time
+                        );
+
+                    }
+                );
+
+            }
+
+            else {
+
+                slot.disabled =
+                    true;
+
+
+                slot.classList.add(
+                    "disabled"
+                );
+
+            }
+
+
+            track.appendChild(
+                slot
+            );
+
+        }
+
+
+        /*
+         * -------------------------
+         * رزروهای واقعی
+         * -------------------------
+         */
+
+        const normalizedBookings =
+            [];
+
+
+        if (
+            Array.isArray(
+                bookedIntervals
+            )
+        ) {
+
+            bookedIntervals.forEach(
+                booking => {
+
+                    const start =
+                        timeToMinutes(
+                            booking.start
+                        );
+
+
+                    const end =
+                        timeToMinutes(
+                            booking.end
+                        );
+
+
+                    if (
+                        start === null ||
+                        end === null ||
+                        end <= start
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const clippedStart =
+                        Math.max(
+                            start,
+                            openingMinutes
+                        );
+
+
+                    const clippedEnd =
+                        Math.min(
+                            end,
+                            closingMinutes
+                        );
+
+
+                    if (
+                        clippedEnd <=
+                        clippedStart
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    normalizedBookings.push(
+                        {
+                            start:
+                                clippedStart,
+
+                            end:
+                                clippedEnd
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        /*
+         * مرتب‌سازی رزروها
+         */
+
+        normalizedBookings.sort(
+            (a, b) =>
+                a.start - b.start
+        );
+
+
+        /*
+         * ادغام رزروهای هم‌پوشان
+         *
+         * برای جلوگیری از اینکه چند
+         * رزرو روی هم رنگ شوند.
+         */
+
+        const mergedBookings =
+            [];
+
+
+        normalizedBookings.forEach(
+            booking => {
+
+                const last =
+                    mergedBookings[
+                        mergedBookings.length - 1
+                    ];
+
+
+                if (
+                    !last ||
+                    booking.start >
+                    last.end
+                ) {
+
+                    mergedBookings.push(
+                        {
+                            start:
+                                booking.start,
+
+                            end:
+                                booking.end
+                        }
+                    );
+
+                }
+
+                else {
+
+                    last.end =
+                        Math.max(
+                            last.end,
+                            booking.end
+                        );
+
+                }
+
+            }
+        );
+
+
+        /*
+         * رسم رزروهای ادغام‌شده
+         */
+
+        mergedBookings.forEach(
+            booking => {
+
+                const left =
+                    (
+                        (booking.start -
+                            openingMinutes)
+                        /
+                        totalMinutes
+                    ) * 100;
+
+
+                const width =
+                    (
+                        (booking.end -
+                            booking.start)
+                        /
+                        totalMinutes
+                    ) * 100;
+
+
+                const booked =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                booked.className =
+                    "timeline-booked";
+
+
+                booked.style.left =
+                    left + "%";
+
+
+                booked.style.width =
+                    width + "%";
+
+
+                const label =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                label.className =
+                    "timeline-booked-label";
+
+
+                label.textContent =
+                    minutesToTime(
+                        booking.start
+                    )
+                    +
+                    " - "
+                    +
+                    minutesToTime(
+                        booking.end
+                    );
+
+
+                /*
+                 * رزروهای کمتر از ۳۰ دقیقه
+                 * متن داخلشان را نشان نمی‌دهیم.
+                 */
+
+                if (
+                    booking.end -
+                    booking.start <
+                    30
+                ) {
+
+                    label.style.display =
+                        "none";
+
+                }
+
+
+                booked.appendChild(
+                    label
+                );
+
+
+                track.appendChild(
+                    booked
+                );
+
+            }
+        );
+
+
+        /*
+         * -------------------------
+         * برچسب ساعت‌ها
+         * -------------------------
+         */
+
+        const labelStep =
+            getTimelineLabelStep(
+                totalMinutes
+            );
+
+
+        for (
+            let offset = 0;
+            offset <= totalMinutes;
+            offset += labelStep
+        ) {
+
+            const actualMinutes =
+                openingMinutes +
+                offset;
+
+
+            if (
+                actualMinutes >
+                closingMinutes
+            ) {
+
+                break;
+
+            }
+
+
+            addTimelineLabel(
+                inner,
+                minutesToTime(
+                    actualMinutes
+                ),
+                (
+                    offset /
+                    totalMinutes
+                ) * 100,
+                offset === 0,
+                offset === totalMinutes
+            );
+
+        }
+
+
+        /*
+         * اگر پایان دقیقاً روی labelStep
+         * نبود، پایان کار را جداگانه نشان بده.
+         */
+
+        if (
+            totalMinutes %
+            labelStep !==
+            0
+        ) {
+
+            addTimelineLabel(
+                inner,
+                businessClosing,
+                100,
+                false,
+                true
+            );
+
+        }
+
+
+        selected.style.display =
+            "none";
+
+
+        updateTimelineSelection();
+
+    }
+
+
+    function getTimelineLabelStep(
+        totalMinutes
+    ) {
+
+        if (
+            totalMinutes <= 240
+        ) {
+
+            return 30;
+
+        }
+
+
+        if (
+            totalMinutes <= 480
+        ) {
+
+            return 60;
+
+        }
+
+
+        return 120;
+
+    }
+
+
+    function addTimelineLabel(
+        container,
+        text,
+        position,
+        isStart,
+        isEnd
+    ) {
+
+        const label =
+            document.createElement(
+                "div"
+            );
+
+
+        label.className =
+            "timeline-label";
+
+
+        if (isStart) {
+
+            label.classList.add(
+                "timeline-start-label"
+            );
+
+        }
+
+
+        if (isEnd) {
+
+            label.classList.add(
+                "timeline-end-label"
+            );
+
+        }
+
+
+        label.textContent =
+            text;
+
+
+        label.style.left =
+            position + "%";
+
+
+        container.appendChild(
+            label
+        );
+
+    }
+
+
+    /* =========================
+       SELECT TIMELINE TIME
+    ========================= */
+
+    function selectTimelineTime(
+        time
+    ) {
+
+        if (
+            !availableTimes.has(
+                time
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const startMinutes =
+            timeToMinutes(
+                time
+            );
+
+
+        if (
+            startMinutes === null
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * یک بررسی دوم سمت Frontend
+         * برای جلوگیری از انتخاب اشتباه.
+         */
+
+        if (
+            !isTimeRangeFree(
+                startMinutes,
+                serviceDuration
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const parts =
+            time.split(":");
+
+
+        hour =
+            Number(parts[0]);
+
+
+        minute =
+            Number(parts[1]);
+
+
+        updateClock();
+
+    }
+
+
+    /* =========================
+       SELECTED TIMELINE
+    ========================= */
+
+    function updateTimelineSelection() {
+
+        const selected =
+            document.getElementById(
+                "timelineSelected"
+            );
+
+
+        const label =
+            document.getElementById(
+                "timelineSelectedLabel"
+            );
+
+
+        if (
+            !selected ||
+            !label ||
+            !businessOpening ||
+            !businessClosing
+        ) {
+
+            return;
+
+        }
+
+
+        const currentTime =
+            getCurrentTimeString();
+
+
+        /*
+         * فقط زمان‌هایی که API
+         * آزاد اعلام کرده‌اند
+         * قابلیت نمایش انتخاب دارند.
+         */
+
+        if (
+            !availableTimes.has(
+                currentTime
+            )
+        ) {
+
+            selected.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        const openingMinutes =
+            timeToMinutes(
+                businessOpening
+            );
+
+
+        const closingMinutes =
+            timeToMinutes(
+                businessClosing
+            );
+
+
+        const currentMinutes =
+            timeToMinutes(
+                currentTime
+            );
+
+
+        if (
+            openingMinutes === null ||
+            closingMinutes === null ||
+            currentMinutes === null
+        ) {
+
+            selected.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        /*
+         * مدت کامل خدمت
+         */
+
+        const endMinutes =
+            currentMinutes +
+            serviceDuration;
+
+
+        /*
+         * اگر خدمت از ساعت کاری
+         * عبور کند، انتخاب نمایش داده نشود.
+         */
+
+        if (
+            currentMinutes <
+                openingMinutes ||
+            endMinutes >
+                closingMinutes
+        ) {
+
+            selected.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        /*
+         * اگر به هر دلیل با رزرو
+         * تداخل دارد، انتخاب نمایش داده نشود.
+         */
+
+        if (
+            !isTimeRangeFree(
+                currentMinutes,
+                serviceDuration
+            )
+        ) {
+
+            selected.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        const totalMinutes =
+            closingMinutes -
+            openingMinutes;
+
+
+        const left =
+            (
+                (currentMinutes -
+                    openingMinutes)
+                /
+                totalMinutes
+            ) * 100;
+
+
+        const width =
+            (
+                serviceDuration /
+                totalMinutes
+            ) * 100;
+
+
+        selected.style.left =
+            left + "%";
+
+
+        selected.style.width =
+            width + "%";
+
+
+        selected.style.display =
+            "block";
+
+
+        label.textContent =
+            currentTime +
+            " تا " +
+            minutesToTime(
+                endMinutes
+            );
+
+    }
+
+
+    /* =========================
+       OPEN MODAL
+    ========================= */
+
+    function openTimeModal(
+        dateValue,
+        jalaliDate
+    ) {
+
+        selectedDateValue =
+            dateValue;
+
+
+        selectedJalaliDate =
+            jalaliDate;
+
+
+        selectedTime =
+            null;
+
+
+        bookedIntervals =
+            [];
+
+
+        businessOpening =
+            null;
+
+
+        businessClosing =
+            null;
+
+
+        serviceDuration =
+            0;
+
+
+        document
+            .getElementById(
+                "selectedDate"
+            )
+            .textContent =
+                jalaliDate;
+
+
+        document
+            .getElementById(
+                "customerDate"
+            )
+            .textContent =
+                jalaliDate;
+
+
+        document
+            .getElementById(
+                "customerTime"
+            )
+            .textContent =
+                "-";
+
+
+        document
+            .getElementById(
+                "bookingInfo"
+            )
+            .style.display =
+                "flex";
+
+
+        document
+            .getElementById(
+                "loadingState"
+            )
+            .style.display =
+                "flex";
+
+
+        document
+            .getElementById(
+                "errorState"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "clockSection"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "customerSection"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "successSection"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "confirmButton"
+            )
+            .style.display =
+                "block";
+
+
+        document
+            .getElementById(
+                "modalTitle"
+            )
+            .textContent =
+                "انتخاب ساعت";
+
+
+        document
+            .getElementById(
+                "confirmButton"
+            )
+            .disabled =
+                true;
+
+
+        document
+            .getElementById(
+                "formError"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "customerPhone"
+            )
+            .value =
+                "";
+
+
+        document
+            .getElementById(
+                "customerName"
+            )
+            .value =
+                "";
+
+
+        document
+            .getElementById(
+                "customerLookupStatus"
+            )
+            .className =
+                "customer-lookup-status";
+
+
+        document
+            .getElementById(
+                "customerLookupStatus"
+            )
+            .textContent =
+                "";
+
+
+        document
+            .getElementById(
+                "submitBookingButton"
+            )
+            .disabled =
+                true;
+
+
+        clearTimeout(
+            phoneLookupTimer
+        );
+
+
+        phoneLookupRequestId += 1;
+
+
+        availableTimes =
+            new Set();
+
+
+        document
+            .getElementById(
+                "timeModal"
+            )
+            .classList.add(
+                "active"
+            );
+
+
+        loadAvailableTimes(
+            dateValue
+        );
+
+    }
+
+
+    /* =========================
+       LOAD API
+    ========================= */
+
+    async function loadAvailableTimes(
+        dateValue
+    ) {
+
+        const loading =
+            document.getElementById(
+                "loadingState"
+            );
+
+
+        const errorState =
+            document.getElementById(
+                "errorState"
+            );
+
+
+        const clock =
+            document.getElementById(
+                "clockSection"
+            );
+
+
+        try {
+
+            const url =
+                "{% url 'available_booking_times' service.id 'DATE_PLACEHOLDER' %}"
+                .replace(
+                    "DATE_PLACEHOLDER",
+                    dateValue
+                );
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "API Error"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                throw new Error(
+                    data.error ||
+                    "خطا در دریافت ساعت‌ها"
+                );
+
+            }
+
+
+            /*
+             * -------------------------
+             * ساعات کاری
+             * -------------------------
+             */
+
+            businessOpening =
+                data.business_hours &&
+                data.business_hours.opening
+                    ?
+                    data.business_hours.opening
+                    :
+                    null;
+
+
+            businessClosing =
+                data.business_hours &&
+                data.business_hours.closing
+                    ?
+                    data.business_hours.closing
+                    :
+                    null;
+
+
+            /*
+             * -------------------------
+             * مدت خدمت
+             * -------------------------
+             */
+
+            serviceDuration =
+                data.service &&
+                data.service.duration
+                    ?
+                    Number(
+                        data.service.duration
+                    )
+                    :
+                    0;
+
+
+            /*
+             * -------------------------
+             * زمان‌های آزاد
+             * -------------------------
+             */
+
+            const validTimes =
+                Array.isArray(
+                    data.times
+                )
+                    ?
+                    data.times.filter(
+                        item => {
+
+                            if (
+                                !item ||
+                                !item.time
+                            ) {
+
+                                return false;
+
+                            }
+
+
+                            const minutes =
+                                timeToMinutes(
+                                    item.time
+                                );
+
+
+                            if (
+                                minutes === null
+                            ) {
+
+                                return false;
+
+                            }
+
+
+                            return (
+                                minutes % 15 === 0
+                            );
+
+                        }
+                    )
+                    :
+                    [];
+
+
+            availableTimes =
+                new Set(
+                    validTimes.map(
+                        item =>
+                            item.time
+                    )
+                );
+
+
+            /*
+             * -------------------------
+             * رزروهای واقعی
+             * -------------------------
+             */
+
+            bookedIntervals =
+                Array.isArray(
+                    data.booked_intervals
+                )
+                    ?
+                    data.booked_intervals
+                    :
+                    [];
+
+
+            /*
+             * -------------------------
+             * اعتبارسنجی داده
+             * -------------------------
+             */
+
+            if (
+                !businessOpening ||
+                !businessClosing
+            ) {
+
+                loading.style.display =
+                    "none";
+
+
+                clock.style.display =
+                    "none";
+
+
+                errorState.textContent =
+                    "ساعات کاری این روز دریافت نشد.";
+
+
+                errorState.style.display =
+                    "block";
+
+
+                return;
+
+            }
+
+
+            loading.style.display =
+                "none";
+
+
+            /*
+             * Timeline حتی در روز کاملاً
+             * پر نیز نمایش داده می‌شود.
+             */
+
+            clock.style.display =
+                "flex";
+
+
+            renderTimeline();
+
+
+            /*
+             * هیچ زمان آزادی وجود ندارد.
+             */
+
+            if (
+                availableTimes.size === 0
+            ) {
+
+                document
+                    .getElementById(
+                        "availabilityStatus"
+                    )
+                    .className =
+                        "availability unavailable";
+
+
+                document
+                    .getElementById(
+                        "availabilityStatus"
+                    )
+                    .textContent =
+                        "✕ در این روز ساعت قابل رزروی وجود ندارد";
+
+
+                document
+                    .getElementById(
+                        "confirmButton"
+                    )
+                    .disabled =
+                        true;
+
+
+                return;
+
+            }
+
+
+            /*
+             * اولین زمان آزاد
+             */
+
+            const firstAvailable =
+                validTimes[0].time;
+
+
+            const firstParts =
+                firstAvailable.split(":");
+
+
+            hour =
+                Number(
+                    firstParts[0]
+                );
+
+
+            minute =
+                Number(
+                    firstParts[1]
+                );
+
+
+            updateClock();
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Available times error:",
+                error
+            );
+
+
+            loading.style.display =
+                "none";
+
+
+            clock.style.display =
+                "none";
+
+
+            errorState.textContent =
+                "دریافت ساعت‌های قابل رزرو با مشکل مواجه شد.";
+
+
+            errorState.style.display =
+                "block";
+
+
+            document
+                .getElementById(
+                    "confirmButton"
+                )
+                .disabled =
+                true;
+
+        }
+
+    }
+
+
+    /* =========================
+       CONFIRM TIME
+    ========================= */
+
+    function confirmTime() {
+
+        if (!selectedTime) {
+            return;
+        }
+
+
+        document
+            .getElementById(
+                "customerTime"
+            )
+            .textContent =
+                selectedTime;
+
+
+        document
+            .getElementById(
+                "customerSection"
+            )
+            .style.display =
+                "block";
+
+
+        document
+            .getElementById(
+                "clockSection"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "confirmButton"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "modalTitle"
+            )
+            .textContent =
+                "اطلاعات مشتری";
+
+
+        document
+            .getElementById(
+                "customerPhone"
+            )
+            .focus();
+
+    }
+
+
+    /* =========================
+       SUBMIT BUTTON
+    ========================= */
+
+    function updateSubmitButton() {
+
+        const phone =
+            normalizePhone(
+                document
+                    .getElementById(
+                        "customerPhone"
+                    )
+                    .value
+            );
+
+
+        const name =
+            document
+                .getElementById(
+                    "customerName"
+                )
+                .value
+                .trim();
+
+
+        const button =
+            document
+                .getElementById(
+                    "submitBookingButton"
+                );
+
+
+        const validPhone =
+            /^09\d{9}$/.test(
+                phone
+            );
+
+
+        button.disabled =
+            !validPhone ||
+            !name ||
+            !selectedDateValue ||
+            !selectedTime;
+
+    }
+
+
+    /* =========================
+       CUSTOMER PHONE
+    ========================= */
+
+    function handlePhoneInput() {
+
+        const phoneInput =
+            document.getElementById(
+                "customerPhone"
+            );
+
+
+        const nameInput =
+            document.getElementById(
+                "customerName"
+            );
+
+
+        const status =
+            document.getElementById(
+                "customerLookupStatus"
+            );
+
+
+        const phone =
+            normalizePhone(
+                phoneInput.value
+            );
+
+
+        clearTimeout(
+            phoneLookupTimer
+        );
+
+
+        phoneLookupRequestId += 1;
+
+
+        const currentRequestId =
+            phoneLookupRequestId;
+
+
+        if (
+            !/^09\d{9}$/.test(
+                phone
+            )
+        ) {
+
+            status.className =
+                "customer-lookup-status";
+
+
+            status.textContent =
+                "";
+
+
+            updateSubmitButton();
+
+
+            return;
+
+        }
+
+
+        phoneInput.value =
+            phone;
+
+
+        status.className =
+            "customer-lookup-status loading";
+
+
+        status.textContent =
+            "در حال بررسی مشتری...";
+
+
+        phoneLookupTimer =
+            setTimeout(
+                function () {
+
+                    lookupCustomer(
+                        phone,
+                        currentRequestId
+                    );
+
+                },
+                350
+            );
+
+    }
+
+
+    /* =========================
+       FIND CUSTOMER
+    ========================= */
+
+    async function lookupCustomer(
+        phone,
+        requestId
+    ) {
+
+        const status =
+            document.getElementById(
+                "customerLookupStatus"
+            );
+
+
+        const nameInput =
+            document.getElementById(
+                "customerName"
+            );
+
+
+        try {
+
+            const url =
+                "{% url 'find_customer_by_phone' %}"
+                +
+                "?phone="
+                +
+                encodeURIComponent(
+                    phone
+                );
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                requestId !==
+                phoneLookupRequestId
+            ) {
+
+                return;
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "خطا در جستجوی مشتری"
+                );
+
+            }
+
+
+            if (
+                data.success &&
+                data.exists
+            ) {
+
+                nameInput.value =
+                    data.customer.name ||
+                    "";
+
+
+                status.className =
+                    "customer-lookup-status success";
+
+
+                status.textContent =
+                    "✓ مشتری قبلاً ثبت شده است. نام قابل ویرایش است.";
+
+            }
+
+            else {
+
+                nameInput.value =
+                    "";
+
+
+                status.className =
+                    "customer-lookup-status new";
+
+
+                status.textContent =
+                    "مشتری جدید است. نام و نام خانوادگی را وارد کنید.";
+
+            }
+
+
+            updateSubmitButton();
+
+
+            if (
+                !nameInput.value.trim()
+            ) {
+
+                nameInput.focus();
+
+            }
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Customer lookup error:",
+                error
+            );
+
+
+            if (
+                requestId !==
+                phoneLookupRequestId
+            ) {
+
+                return;
+
+            }
+
+
+            status.className =
+                "customer-lookup-status error";
+
+
+            status.textContent =
+                "بررسی مشتری انجام نشد. می‌توانید نام را دستی وارد کنید.";
+
+
+            updateSubmitButton();
+
+        }
+
+    }
+
+
+    /* =========================
+       SUCCESS
+    ========================= */
+
+    function showBookingSuccess(
+        booking
+    ) {
+
+        document
+            .getElementById(
+                "bookingInfo"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "loadingState"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "errorState"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "clockSection"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "confirmButton"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "customerSection"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "successService"
+            )
+            .textContent =
+                booking.service ||
+                "{{ service.name }}";
+
+
+        document
+            .getElementById(
+                "successCustomer"
+            )
+            .textContent =
+                booking.customer_name ||
+                "-";
+
+
+        document
+            .getElementById(
+                "successDate"
+            )
+            .textContent =
+                selectedJalaliDate ||
+                "-";
+
+
+        document
+            .getElementById(
+                "successTime"
+            )
+            .textContent =
+                booking.time ||
+                selectedTime ||
+                "-";
+
+
+        document
+            .getElementById(
+                "successSection"
+            )
+            .style.display =
+                "flex";
+
+
+        document
+            .getElementById(
+                "modalTitle"
+            )
+            .textContent =
+                "ثبت موفق رزرو";
+
+    }
+
+
+    /* =========================
+       SUBMIT BOOKING
+    ========================= */
+
+    async function submitBooking() {
+
+        const nameInput =
+            document.getElementById(
+                "customerName"
+            );
+
+
+        const phoneInput =
+            document.getElementById(
+                "customerPhone"
+            );
+
+
+        const formError =
+            document.getElementById(
+                "formError"
+            );
+
+
+        const submitButton =
+            document.getElementById(
+                "submitBookingButton"
+            );
+
+
+        const customerName =
+            nameInput.value.trim();
+
+
+        const phoneForSubmit =
+            normalizePhone(
+                phoneInput.value
+            );
+
+
+        formError.style.display =
+            "none";
+
+
+        if (
+            !/^09\d{9}$/.test(
+                phoneForSubmit
+            )
+        ) {
+
+            formError.textContent =
+                "لطفاً شماره موبایل معتبر وارد کنید.";
+
+
+            formError.style.display =
+                "block";
+
+
+            phoneInput.focus();
+
+
+            return;
+
+        }
+
+
+        if (!customerName) {
+
+            formError.textContent =
+                "لطفاً نام و نام خانوادگی را وارد کنید.";
+
+
+            formError.style.display =
+                "block";
+
+
+            nameInput.focus();
+
+
+            return;
+
+        }
+
+
+        if (
+            !selectedDateValue ||
+            !selectedTime
+        ) {
+
+            formError.textContent =
+                "تاریخ و ساعت رزرو مشخص نشده است.";
+
+
+            formError.style.display =
+                "block";
+
+
+            return;
+
+        }
+
+
+        const csrfElement =
+            document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            );
+
+
+        if (!csrfElement) {
+
+            formError.textContent =
+                "خطا در امنیت درخواست. صفحه را دوباره بارگذاری کنید.";
+
+
+            formError.style.display =
+                "block";
+
+
+            return;
+
+        }
+
+
+        const csrfToken =
+            csrfElement.value;
+
+
+        submitButton.disabled =
+            true;
+
+
+        submitButton.textContent =
+            "در حال ثبت رزرو";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "{% url 'create_booking' service.id %}",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "X-CSRFToken":
+                                csrfToken
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                date:
+                                    selectedDateValue,
+
+                                time:
+                                    selectedTime,
+
+                                customer_name:
+                                    customerName,
+
+                                customer_phone:
+                                    phoneForSubmit
+
+                            })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                formError.textContent =
+                    data.error ||
+                    "ثبت رزرو انجام نشد.";
+
+
+                formError.style.display =
+                    "block";
+
+
+                return;
+
+            }
+
+
+            if (data.success) {
+
+                showBookingSuccess(
+                    data.booking
+                );
+
+            }
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Booking error:",
+                error
+            );
+
+
+            formError.textContent =
+                "ارتباط با سرور برقرار نشد. دوباره تلاش کنید.";
+
+
+            formError.style.display =
+                "block";
+
+        }
+
+
+        finally {
+
+            submitButton.disabled =
+                false;
+
+
+            submitButton.textContent =
+                "ثبت رزرو";
+
+
+            updateSubmitButton();
+
+        }
+
+    }
+
+
+    /* =========================
+       INPUT EVENTS
+    ========================= */
+
+    document
+        .getElementById(
+            "customerPhone"
+        )
+        .addEventListener(
+            "input",
+            handlePhoneInput
+        );
+
+
+    document
+        .getElementById(
+            "customerName"
+        )
+        .addEventListener(
+            "input",
+            function () {
+
+                document
+                    .getElementById(
+                        "formError"
+                    )
+                    .style.display =
+                        "none";
+
+
+                updateSubmitButton();
+
+            }
+        );
+
+
+    /* =========================
+       CLOSE MODAL
+    ========================= */
+
+    function closeTimeModal() {
+
+        clearTimeout(
+            phoneLookupTimer
+        );
+
+
+        phoneLookupRequestId += 1;
+
+
+        document
+            .getElementById(
+                "timeModal"
+            )
+            .classList.remove(
+                "active"
+            );
+
+    }
+
+
+    function closeModalFromOverlay(
+        event
+    ) {
+
+        if (
+            event.target.id ===
+            "timeModal"
+        ) {
+
+            closeTimeModal();
+
+        }
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

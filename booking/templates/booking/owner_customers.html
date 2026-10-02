@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        مشتریان
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+
+            font-family:
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            background: #f5f5f5;
+
+            color: #222;
+        }
+
+
+        .container {
+            width: 100%;
+
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            padding: 25px 20px 40px;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .page-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .page-title {
+            margin: 0;
+
+            font-size: 25px;
+        }
+
+
+        .page-subtitle {
+            margin-top: 7px;
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        .back-button {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 11px 16px;
+
+            border-radius: 11px;
+
+            background: white;
+
+            color: #333;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.06);
+        }
+
+
+        .back-button:hover {
+            background: #f0f0f0;
+        }
+
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .summary {
+            margin-bottom: 18px;
+
+            color: #666;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           CUSTOMER LIST
+        ========================= */
+
+        .customers-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 14px;
+        }
+
+
+        .customer-card {
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.06);
+        }
+
+
+        .customer-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .customer-info {
+            min-width: 0;
+        }
+
+
+        .customer-name {
+            margin-bottom: 7px;
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .customer-phone {
+            color: #777;
+
+            font-size: 13px;
+
+            direction: ltr;
+
+            text-align: right;
+        }
+
+
+        .booking-count {
+            flex-shrink: 0;
+
+            padding: 8px 12px;
+
+            border-radius: 10px;
+
+            background: #f2f2f2;
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           SERVICES
+        ========================= */
+
+        .section-title {
+            margin-bottom: 10px;
+
+            color: #555;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+
+        .services-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+
+        .service-item {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 10px 12px;
+
+            border-radius: 10px;
+
+            background: #f7f7f7;
+
+            font-size: 13px;
+        }
+
+
+        .service-name {
+            color: #444;
+        }
+
+
+        .service-count {
+            flex-shrink: 0;
+
+            color: #777;
+        }
+
+
+        /* =========================
+           LAST BOOKING
+        ========================= */
+
+        .last-booking {
+            margin-top: 18px;
+
+            padding-top: 15px;
+
+            border-top:
+                1px solid #eee;
+        }
+
+
+        .last-booking-info {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+
+        .last-booking-service {
+            font-weight: bold;
+        }
+
+
+        .last-booking-time {
+            color: #777;
+
+            direction: ltr;
+        }
+
+
+        /* =========================
+           EMPTY
+        ========================= */
+
+        .empty-state {
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 45px 20px;
+
+            text-align: center;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.05);
+        }
+
+
+        .empty-title {
+            margin-bottom: 8px;
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .empty-text {
+            color: #777;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding:
+                    20px 15px 35px;
+            }
+
+
+            .page-header {
+                align-items: flex-start;
+            }
+
+
+            .page-title {
+                font-size: 21px;
+            }
+
+
+            .back-button {
+                padding:
+                    9px 12px;
+
+                font-size: 13px;
+            }
+
+
+            .customer-card {
+                padding: 17px;
+            }
+
+
+            .customer-header {
+                align-items: flex-start;
+            }
+
+
+            .customer-name {
+                font-size: 16px;
+            }
+
+
+            .booking-count {
+                font-size: 12px;
+            }
+
+
+            .last-booking-info {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 6px;
+            }
+
+        }
+
+
+        @media (max-width: 380px) {
+
+            .customer-header {
+                gap: 10px;
+            }
+
+
+            .booking-count {
+                padding:
+                    7px 9px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <div class="page-header">
+
+
+        <div>
+
+            <h1 class="page-title">
+                مشتریان
+            </h1>
+
+            <div class="page-subtitle">
+                {{ business.name }}
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'owner_dashboard' %}"
+            class="back-button"
+        >
+            بازگشت
+        </a>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         SUMMARY
+    ========================= -->
+
+    <div class="summary">
+
+        تعداد مشتریان:
+        <strong>
+            {{ customers|length }}
+        </strong>
+
+    </div>
+
+
+
+    <!-- =========================
+         CUSTOMERS
+    ========================= -->
+
+    {% if customers %}
+
+
+        <div class="customers-list">
+
+
+            {% for item in customers %}
+
+
+                <div class="customer-card">
+
+
+                    <!-- Customer -->
+
+                    <div class="customer-header">
+
+
+                        <div class="customer-info">
+
+                            <div class="customer-name">
+                                {{ item.customer.first_name }}
+                                {% if item.customer.last_name %}
+                                    {{ item.customer.last_name }}
+                                {% endif %}
+                            </div>
+
+
+                            <div class="customer-phone">
+                                {{ item.customer.phone }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="booking-count">
+
+                            {{ item.booking_count }}
+                            رزرو
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- Services -->
+
+                    <div>
+
+                        <div class="section-title">
+                            خدمات دریافت‌شده
+                        </div>
+
+
+                        <div class="services-list">
+
+
+                            {% for service in item.services %}
+
+
+                                <div class="service-item">
+
+
+                                    <div class="service-name">
+                                        {{ service.name }}
+                                    </div>
+
+
+                                    <div class="service-count">
+
+                                        {{ service.count }}
+                                        رزرو
+
+                                    </div>
+
+
+                                </div>
+
+
+                            {% endfor %}
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Last Booking -->
+
+                    {% if item.last_booking %}
+
+
+                        <div class="last-booking">
+
+
+                            <div class="section-title">
+                                آخرین رزرو
+                            </div>
+
+
+                            <div class="last-booking-info">
+
+
+                                <div class="last-booking-service">
+
+                                    {{ item.last_booking.service.name }}
+
+                                </div>
+
+
+                                <div class="last-booking-time">
+
+                                    {{ item.last_booking.start_time|date:"Y/m/d - H:i" }}
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <div class="empty-state">
+
+            <div class="empty-title">
+                هنوز مشتری‌ای ثبت نشده است
+            </div>
+
+            <div class="empty-text">
+                مشتریانی که حداقل یک رزرو برای این کسب‌وکار داشته باشند،
+                در این قسمت نمایش داده می‌شوند.
+            </div>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>

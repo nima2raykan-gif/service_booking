@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ service.name }}</title>
+
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .service-card h1 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .service-info {
+            line-height: 2;
+            color: #555;
+        }
+
+        .info-item {
+            background: #f8f8f8;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .booking-button {
+            display: block;
+            margin-top: 25px;
+            padding: 14px;
+            background: #222;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .booking-button:hover {
+            background: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="service-card">
+
+        <h1>{{ service.name }}</h1>
+
+        <div class="service-info">
+
+            <div class="info-item">
+                کسب‌وکار:
+                {{ service.business.name }}
+            </div>
+
+            <div class="info-item">
+                مدت زمان:
+                {{ service.duration }} دقیقه
+            </div>
+
+            {% if service.price %}
+                <div class="info-item">
+                    قیمت:
+                    {{ service.price }} تومان
+                </div>
+            {% endif %}
+
+        </div>
+
+        <a
+            href="{% url 'booking_date_selection' service.id %}"
+            class="booking-button"
+        >
+            انتخاب زمان و رزرو
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        همه رزروها
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+
+            font-family:
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            background: #f5f5f5;
+
+            color: #222;
+        }
+
+
+        .container {
+            width: 100%;
+
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            padding: 25px 20px 40px;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .page-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .page-title {
+            margin: 0;
+
+            font-size: 25px;
+        }
+
+
+        .page-subtitle {
+            margin-top: 7px;
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        .back-button {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 11px 16px;
+
+            border-radius: 11px;
+
+            background: white;
+
+            color: #333;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(0, 0, 0, 0.06);
+        }
+
+
+        .back-button:hover {
+            background: #f0f0f0;
+        }
+
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .summary {
+            margin-bottom: 18px;
+
+            color: #666;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           BOOKINGS
+        ========================= */
+
+        .bookings-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+        }
+
+
+        .booking-card {
+            width: 100%;
+
+            border: none;
+
+            border-radius: 16px;
+
+            background: white;
+
+            padding: 18px;
+
+            text-align: right;
+
+            font-family: inherit;
+
+            color: inherit;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.06);
+
+            transition:
+                transform 0.15s,
+                box-shadow 0.15s;
+        }
+
+
+        .booking-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 6px 18px
+                rgba(0, 0, 0, 0.09);
+        }
+
+
+        .booking-main {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+
+        .booking-customer {
+            min-width: 0;
+        }
+
+
+        .customer-name {
+            margin-bottom: 7px;
+
+            font-size: 17px;
+
+            font-weight: bold;
+        }
+
+
+        .customer-phone {
+            color: #777;
+
+            font-size: 13px;
+
+            direction: ltr;
+
+            text-align: right;
+        }
+
+
+        .booking-time {
+            flex-shrink: 0;
+
+            text-align: center;
+        }
+
+
+        .booking-time-value {
+            font-size: 21px;
+
+            font-weight: bold;
+        }
+
+
+        .booking-date {
+            margin-top: 5px;
+
+            color: #777;
+
+            font-size: 13px;
+        }
+
+
+        .booking-service {
+            margin-top: 15px;
+
+            padding-top: 13px;
+
+            border-top:
+                1px solid #eee;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
+        .service-name {
+            font-size: 14px;
+
+            color: #444;
+        }
+
+
+        .service-duration {
+            flex-shrink: 0;
+
+            color: #777;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           EMPTY
+        ========================= */
+
+        .empty-state {
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 45px 20px;
+
+            text-align: center;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.05);
+        }
+
+
+        .empty-title {
+            margin-bottom: 8px;
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .empty-text {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal-overlay {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 1000;
+
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            background:
+                rgba(0, 0, 0, 0.55);
+        }
+
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+
+        .modal {
+            width: 100%;
+
+            max-width: 480px;
+
+            max-height: 90vh;
+
+            overflow-y: auto;
+
+            border-radius: 20px;
+
+            background: white;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.25);
+        }
+
+
+        .modal-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 18px 20px;
+
+            border-bottom:
+                1px solid #eee;
+        }
+
+
+        .modal-title {
+            margin: 0;
+
+            font-size: 19px;
+        }
+
+
+        .close-button {
+            width: 36px;
+
+            height: 36px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: #f2f2f2;
+
+            font-size: 22px;
+
+            cursor: pointer;
+        }
+
+
+        .modal-body {
+            padding: 20px;
+        }
+
+
+        .detail-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 14px;
+        }
+
+
+        .detail-row {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding-bottom: 12px;
+
+            border-bottom:
+                1px solid #eee;
+        }
+
+
+        .detail-row:last-child {
+            border-bottom: none;
+
+            padding-bottom: 0;
+        }
+
+
+        .detail-label {
+            color: #777;
+
+            font-size: 13px;
+        }
+
+
+        .detail-value {
+            font-size: 14px;
+
+            font-weight: bold;
+
+            text-align: left;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding:
+                    20px 15px 35px;
+            }
+
+
+            .page-header {
+                align-items: flex-start;
+            }
+
+
+            .page-title {
+                font-size: 21px;
+            }
+
+
+            .back-button {
+                padding:
+                    9px 12px;
+
+                font-size: 13px;
+            }
+
+
+            .booking-main {
+                align-items: flex-start;
+            }
+
+
+            .customer-name {
+                font-size: 16px;
+            }
+
+
+            .booking-time-value {
+                font-size: 19px;
+            }
+
+
+            .booking-service {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 7px;
+            }
+
+
+            .modal-overlay {
+                align-items: flex-end;
+
+                padding: 10px;
+            }
+
+
+            .modal {
+                max-height: 92vh;
+
+                border-radius:
+                    20px 20px 0 0;
+            }
+
+        }
+
+
+        @media (max-width: 380px) {
+
+            .booking-main {
+                gap: 10px;
+            }
+
+
+            .booking-time-value {
+                font-size: 17px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <div class="page-header">
+
+
+        <div>
+
+            <h1 class="page-title">
+                همه رزروها
+            </h1>
+
+            <div class="page-subtitle">
+                {{ business.name }}
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'owner_dashboard' %}"
+            class="back-button"
+        >
+            بازگشت
+        </a>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         SUMMARY
+    ========================= -->
+
+    <div class="summary">
+
+        تعداد رزروها:
+        <strong>
+            {{ bookings|length }}
+        </strong>
+
+    </div>
+
+
+
+    <!-- =========================
+         BOOKINGS
+    ========================= -->
+
+    {% if bookings %}
+
+
+        <div class="bookings-list">
+
+
+            {% for item in bookings %}
+
+                {% with booking=item.booking %}
+
+
+                    <button
+                        type="button"
+                        class="booking-card"
+                        onclick="openBookingModal(
+                            '{{ booking.customer_name|escapejs }}',
+                            '{{ booking.customer_phone|escapejs }}',
+                            '{{ booking.service.name|escapejs }}',
+                            '{{ booking.service.duration }}',
+                            '{{ item.jalali_date }}',
+                            '{{ item.start_time }}',
+                            '{{ item.end_time }}'
+                        )"
+                    >
+
+
+                        <div class="booking-main">
+
+
+                            <div class="booking-customer">
+
+                                <div class="customer-name">
+                                    {{ booking.customer_name }}
+                                </div>
+
+                                <div class="customer-phone">
+                                    {{ booking.customer_phone }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="booking-time">
+
+                                <div class="booking-time-value">
+                                    {{ item.start_time }}
+                                </div>
+
+                                <div class="booking-date">
+                                    {{ item.jalali_date }}
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <div class="booking-service">
+
+
+                            <div class="service-name">
+                                {{ booking.service.name }}
+                            </div>
+
+
+                            <div class="service-duration">
+                                {{ booking.service.duration }}
+                                دقیقه
+                            </div>
+
+
+                        </div>
+
+
+                    </button>
+
+
+                {% endwith %}
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <div class="empty-state">
+
+            <div class="empty-title">
+                هنوز رزروی ثبت نشده است
+            </div>
+
+            <div class="empty-text">
+                وقتی رزروی ثبت شود، اینجا نمایش داده خواهد شد.
+            </div>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =========================
+     MODAL
+========================= -->
+
+
+<div
+    id="bookingModal"
+    class="modal-overlay"
+    onclick="closeModalFromOverlay(event)"
+>
+
+
+    <div
+        class="modal"
+        onclick="event.stopPropagation()"
+    >
+
+
+        <div class="modal-header">
+
+
+            <h2 class="modal-title">
+                جزئیات رزرو
+            </h2>
+
+
+            <button
+                type="button"
+                class="close-button"
+                onclick="closeBookingModal()"
+            >
+                ×
+            </button>
+
+
+        </div>
+
+
+        <div class="modal-body">
+
+
+            <div class="detail-list">
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        نام مشتری
+                    </div>
+
+                    <div
+                        id="detailCustomerName"
+                        class="detail-value"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        شماره تماس
+                    </div>
+
+                    <div
+                        id="detailCustomerPhone"
+                        class="detail-value"
+                        dir="ltr"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        خدمت
+                    </div>
+
+                    <div
+                        id="detailService"
+                        class="detail-value"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        مدت خدمت
+                    </div>
+
+                    <div
+                        id="detailDuration"
+                        class="detail-value"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        تاریخ
+                    </div>
+
+                    <div
+                        id="detailDate"
+                        class="detail-value"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        ساعت شروع
+                    </div>
+
+                    <div
+                        id="detailStartTime"
+                        class="detail-value"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        ساعت پایان
+                    </div>
+
+                    <div
+                        id="detailEndTime"
+                        class="detail-value"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+    function openBookingModal(
+        customerName,
+        customerPhone,
+        serviceName,
+        duration,
+        date,
+        startTime,
+        endTime
+    ) {
+
+        document.getElementById(
+            "detailCustomerName"
+        ).textContent = customerName;
+
+
+        document.getElementById(
+            "detailCustomerPhone"
+        ).textContent = customerPhone;
+
+
+        document.getElementById(
+            "detailService"
+        ).textContent = serviceName;
+
+
+        document.getElementById(
+            "detailDuration"
+        ).textContent =
+            duration + " دقیقه";
+
+
+        document.getElementById(
+            "detailDate"
+        ).textContent = date;
+
+
+        document.getElementById(
+            "detailStartTime"
+        ).textContent = startTime;
+
+
+        document.getElementById(
+            "detailEndTime"
+        ).textContent = endTime;
+
+
+        document.getElementById(
+            "bookingModal"
+        ).classList.add(
+            "active"
+        );
+
+    }
+
+
+
+    function closeBookingModal() {
+
+        document.getElementById(
+            "bookingModal"
+        ).classList.remove(
+            "active"
+        );
+
+    }
+
+
+
+    function closeModalFromOverlay(event) {
+
+        if (
+            event.target.id ===
+            "bookingModal"
+        ) {
+
+            closeBookingModal();
+
+        }
+
+    }
+
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape"
+            ) {
+
+                closeBookingModal();
+
+            }
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
